@@ -283,10 +283,11 @@ public class AppointmentController implements Initializable {
     private boolean checkOverlap(Appointment appt) {
         boolean overlap = false; 
         for(Appointment tempAppt : appointmentList){
-            System.out.println("appt: " + appt.getStartTime().toInstant());
-            System.out.println("other appt: " + tempAppt.getStartTime().toInstant());
-            if(appt.getStartTime().toInstant().isBefore(tempAppt.getStartTime().toInstant())
-                    && appt.getStartTime().toInstant().isAfter(tempAppt.getEndTime().toInstant())){
+            System.out.println("original Appt start: " + tempAppt.getStartTime().toInstant());
+            System.out.println("other appt: " + appt.getStartTime().toInstant());
+            System.out.println("original Appt end: " + tempAppt.getEndTime().toInstant());
+            if(appt.getStartTime().toInstant().isAfter(tempAppt.getStartTime().toInstant())
+                    && appt.getStartTime().toInstant().isBefore(tempAppt.getEndTime().toInstant())){
                 System.out.println("Oerlapping appointment");
                 overlap = true;
             }
