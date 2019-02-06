@@ -27,6 +27,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -64,6 +65,12 @@ public class AppointmentController implements Initializable {
     private TextField startTimeTextBox;
     @FXML
     private Button cancelBtn;
+    @FXML
+    private Label apptLabel;
+    @FXML
+    private Button addAppointmentBtn;
+    @FXML
+    private Button updateAppointmentBtn;
     
     private DatabaseConn db = null;
     private Customer cust = null;
@@ -74,7 +81,7 @@ public class AppointmentController implements Initializable {
     private UserScheduleController scheduleController = null;
     private LocalTime businessStart = LocalTime.of(9, 0);
     private LocalTime businessEnd = LocalTime.of(17, 0);
-    
+    private Boolean editAppointment = false;
     
     /**
      * Initializes the controller class.
@@ -223,22 +230,13 @@ public class AppointmentController implements Initializable {
                         location, contact, type, tempUrl, startDate, endDate);
 
                 Boolean overlap = checkOverlap(appt);
-
+                
                 if(overlap == false){
-                    this.appointment.setContact(contact);
-                    this.appointment.setCustomer(this.cust);
-                    this.appointment.setDescription(description);
-                    this.appointment.setEndTime(endDate);
-                    this.appointment.setLocation(location);
-                    this.appointment.setStartTime(startDate);
-                    this.appointment.setTitle(title);
-                    this.appointment.setType(type);
-                    this.appointment.setUrl(tempUrl);
-                    this.appointment.setUserId(userId);
 
-                    db.updateAppointment(this.appointment, createDate, currentUser);
+                    db.updateAppointment(this.appointment, appt,createDate, currentUser);
 
                     this.currentUser.addAppointment(appt);
+                    this.currentUser.getUserScheudle().remove(this.appointment);
                     if(this.scheduleController.getWeeklyCalendarValue() == false) {
                         this.scheduleController.setMonthlyCalendar();
                     }
@@ -283,11 +281,11 @@ public class AppointmentController implements Initializable {
     private boolean checkOverlap(Appointment appt) {
         boolean overlap = false; 
         for(Appointment tempAppt : appointmentList){
-            System.out.println("original Appt start: " + tempAppt.getStartTime().toInstant());
-            System.out.println("other appt: " + appt.getStartTime().toInstant());
-            System.out.println("original Appt end: " + tempAppt.getEndTime().toInstant());
             if(appt.getStartTime().toInstant().isAfter(tempAppt.getStartTime().toInstant())
-                    && appt.getStartTime().toInstant().isBefore(tempAppt.getEndTime().toInstant())){
+                    && appt.getStartTime().toInstant().isBefore(tempAppt.getEndTime().toInstant())
+                    && !tempAppt.getTitle().equals(appt.getTitle()) && !tempAppt.getType().equals(appt.getType())
+                    && !tempAppt.getContact().equals(appt.getContact()) 
+                    && !tempAppt.getCustomer().equals(appt.getCustomer())){
                 System.out.println("Oerlapping appointment");
                 overlap = true;
             }
@@ -317,7 +315,7 @@ public class AppointmentController implements Initializable {
     public void setAppointment(Appointment tempAppt) {
         this.appointment = tempAppt;
         this.cust = tempAppt.getCustomer();
-        DateFormat df = new SimpleDateFormat("HH:mm:ss");
+        DateFormat df = new SimpleDateFormat("HH:mm");
                 
         this.apptNameTextBox.setText(tempAppt.getTitle());
         this.contactTextBox.setText(tempAppt.getContact());
@@ -363,5 +361,20 @@ public class AppointmentController implements Initializable {
     
     public void setUserScheduleController(UserScheduleController tempController) {
         this.scheduleController = tempController;
+    }
+    
+    public void setEditAppointment(Boolean bool) {
+        this.editAppointment = bool;
+        
+        if(this.editAppointment == false) {
+            this.apptLabel.setText("Add Appointment");
+            this.addAppointmentBtn.setVisible(true);
+            this.updateAppointmentBtn.setVisible(false);
+        }
+        else if(this.editAppointment == true) {
+            this.apptLabel.setText("Edit Appointment");
+            this.addAppointmentBtn.setVisible(false);
+            this.updateAppointmentBtn.setVisible(true);
+        }
     }
 }

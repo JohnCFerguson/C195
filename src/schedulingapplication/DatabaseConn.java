@@ -357,32 +357,34 @@ public class DatabaseConn {
         return added;
     }
     
-    public Boolean updateAppointment(Appointment appt, String ts, User currentUser) 
+    public Boolean updateAppointment(Appointment curAppt, Appointment updateAppt, String ts, User currentUser) 
             throws ClassNotFoundException {
         Boolean updated = false;
         int apptId = 0;
-        int userId = appt.getUserId();
-        int customerId = appt.getCustomer().getCustomerId();
-        String title  = appt.getTitle();
-        String description = appt.getDescription();
-        String location = appt.getLocation();
-        String contact = appt.getContact();
-        String type = appt.getType();
-        String tempUrl = appt.getUrl();
+        int userId = updateAppt.getUserId();
+        int customerId = updateAppt.getCustomer().getCustomerId();
+        String title  = updateAppt.getTitle();
+        String description = updateAppt.getDescription();
+        String location = updateAppt.getLocation();
+        String contact = updateAppt.getContact();
+        String type = updateAppt.getType();
+        String tempUrl = updateAppt.getUrl();
         SimpleDateFormat sqlDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         sqlDateFormat.setTimeZone(TimeZone.getTimeZone(ZoneId.of("UTC")));
-        String startFormat = sqlDateFormat.format(appt.getStartTime().getTime());
-        String endFormat = sqlDateFormat.format(appt.getEndTime().getTime());
+        String startFormat = sqlDateFormat.format(updateAppt.getStartTime().getTime());
+        String endFormat = sqlDateFormat.format(updateAppt.getEndTime().getTime());
+        String origStart = sqlDateFormat.format(curAppt.getStartTime().getTime());
+        String origEnd = sqlDateFormat.format(curAppt.getEndTime().getTime());
         
         try {
             Class.forName(driver);
             try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-                apptId = getAppointmentId(conn, currentUser, appt, startFormat, endFormat);
+                apptId = getAppointmentId(conn, currentUser, curAppt, origStart, origEnd);
                 if(apptId != 0){
                     PreparedStatement pStmt = null;
-                    String customerStatement = "UPDATE appointment SET customerId = ? "
-                            + "userId = ? title = ? description ?, location = ?, contact = ?, "
-                            + "type = ?, url = ?, start = ?, end = ?, lastUpdate = ?, lastUpdateBy = ?) "
+                    String customerStatement = "UPDATE appointment SET customerId = ?, "
+                            + "userId = ?, title = ?, description = ?, location = ?, contact = ?, "
+                            + "type = ?, url = ?, start = ?, end = ?, lastUpdate = ?, lastUpdateBy = ? "
                             + "WHERE appointmentId = ?";
                     pStmt = conn.prepareStatement(customerStatement);
                     pStmt.setInt(1, customerId);

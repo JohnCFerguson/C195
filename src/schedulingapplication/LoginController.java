@@ -106,11 +106,7 @@ public class LoginController implements Initializable {
             }
         }
         catch(Exception e){
-//            Locale testLoc = new Locale("de", "DE");
-//            ResourceBundle failedLoginMessage = ResourceBundle.getBundle(
-//                    "schedulingapplication/translationBundles/LoginMessagesBundle", loc);
-//            invalidLogin.setText(failedLoginMessage.getString("failedLogin"));
-            System.out.println(e);
+            invalidLogin.setText(failedLoginMessage.getString("failedLogin"));
         }
     }
     

@@ -113,6 +113,7 @@ public class UserScheduleController implements Initializable {
             userInfoController.setCurrentCustomer(cust);
             userInfoController.setCustomerInfoButton("edit");    
             userInfoController.setUserScheduleController(this);
+            
 
             stage.setScene(scene);
             stage.show();
@@ -151,6 +152,7 @@ public class UserScheduleController implements Initializable {
         appointmentController.setAppointmentList(this.currentUser.getUserScheudle());
         appointmentController.setCustomerList(this.customerList);
         appointmentController.setUserScheduleController(this);
+        appointmentController.setEditAppointment(false);
         
         stage.setScene(scene);
         stage.show();
@@ -159,7 +161,7 @@ public class UserScheduleController implements Initializable {
     @FXML
     private void editAppointment() throws IOException {
         try {
-            openAppointment(selectedAppointment);
+            openAppointment(selectedAppointment, true);
         } catch (IOException ex) {
             Logger.getLogger(UserScheduleController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -462,7 +464,7 @@ public class UserScheduleController implements Initializable {
         setCustomerData();
     }
     
-    public void openAppointment(Appointment appt) throws IOException {
+    public void openAppointment(Appointment appt, Boolean bool) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("Appointment.fxml"));
         Stage stage = new Stage();
 
@@ -475,6 +477,8 @@ public class UserScheduleController implements Initializable {
         appointmentController.setAppointmentList(this.currentUser.getUserScheudle());
         appointmentController.setCustomerList(this.customerList);
         appointmentController.setAppointment(appt);
+        appointmentController.setUserScheduleController(this);
+        appointmentController.setEditAppointment(bool);
         
         stage.setScene(scene);
         stage.show();
